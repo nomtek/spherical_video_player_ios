@@ -43,6 +43,13 @@ class Scene3DViewController: GLKViewController
         self.configureView()
     }
 
+    // This is one of update variants used by GLKViewController.
+    // See comment to GLKViewControllerDelegate.glkViewControllerUpdate for more info.
+    func update()
+    {
+    }
+
+    // MARK: - Configuration
     private func configureContext()
     {
         self.context = EAGLContext(API: EAGLRenderingAPI.OpenGLES3)
@@ -55,6 +62,28 @@ class Scene3DViewController: GLKViewController
 
         let skybox = Skybox()
         self.scene3DView.addSceneObject(skybox)
+
+        // Pan gesture recognizer
+        let panGesture = UIPanGestureRecognizer(target: self, action: "panGestureAction:")
+        panGesture.minimumNumberOfTouches = 1
+        panGesture.maximumNumberOfTouches = 1
+        self.view.addGestureRecognizer(panGesture)
+    }
+
+    // MARK: - Event handlers
+    func panGestureAction(sender: UIPanGestureRecognizer)
+    {
+        if (sender.state == .Changed)
+        {
+            let translation = sender.velocityInView(sender.view)
+            let camera = self.scene3DView.camera
+            let dh = Float(translation.x / self.view.frame.size.width) * camera.fovRadians
+            let dv = Float(translation.y / self.view.frame.size.height) * camera.fovRadians
+            let dt = Float(self.timeSinceLastUpdate)
+
+            camera.yaw += dh * dt
+            camera.pitch += dv * dt
+        }
     }
 }
 

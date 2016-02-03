@@ -44,6 +44,17 @@ class Camera: NSObject
         didSet { self.updateProjectionMatrix() }
     }
 
+    // MARK: - View matrix - yaw, pitch
+    var yaw: Float = 0.0
+    {
+        didSet { self.updateViewMatrix() }
+    }
+
+    var pitch: Float = 0.0
+    {
+        didSet { self.updateViewMatrix() }
+    }
+
     // MARK: - Matrix getters
     var projection: GLKMatrix4
     {
@@ -75,7 +86,21 @@ class Camera: NSObject
 
     private func updateViewMatrix()
     {
-        // Look in the direction of z+ axis
-        self.viewMatrix = GLKMatrix4MakeLookAt(0, 0, 0, 0, 0, 1, 0, 1, 0)
+        let cosPitch = cosf(self.pitch)
+        let sinPitch = sinf(self.pitch)
+        let cosYaw = cosf(self.yaw)
+        let sinYaw = sinf(self.yaw)
+
+        let xaxis = GLKVector3(v: (cosYaw, 0, -sinYaw))
+        let yaxis = GLKVector3(v: (sinYaw * sinPitch, cosPitch, cosYaw * sinPitch))
+        let zaxis = GLKVector3(v: (sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw))
+
+        self.viewMatrix = GLKMatrix4(m:
+            (
+                xaxis.x, yaxis.x, zaxis.x, 0,
+                xaxis.y, yaxis.y, zaxis.y, 0,
+                xaxis.z, yaxis.z, zaxis.z, 0,
+                0, 0, 0, 1
+        ))
     }
 }
