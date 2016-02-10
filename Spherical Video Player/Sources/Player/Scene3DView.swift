@@ -50,7 +50,6 @@ class Scene3DView: GLKView
     {
         super.layoutSubviews()
         self.camera.aspect = fabsf(Float(self.bounds.size.width / self.bounds.size.height))
-        print("aspect = \(self.camera.aspect)")
     }
 
     override func display()

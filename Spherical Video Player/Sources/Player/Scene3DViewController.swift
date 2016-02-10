@@ -63,6 +63,10 @@ class Scene3DViewController: GLKViewController
         let skybox = Skybox()
         self.scene3DView.addSceneObject(skybox)
 
+        let skysphere = Skysphere(radius: 60)
+        skysphere.loadTexture(UIImage(named: "spheremap.png"))
+        self.scene3DView.addSceneObject(skysphere)
+
         // Pan gesture recognizer
         let panGesture = UIPanGestureRecognizer(target: self, action: "panGestureAction:")
         panGesture.minimumNumberOfTouches = 1

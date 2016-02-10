@@ -22,6 +22,9 @@
 		446637011C4E4D1400F93278 /* posx.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 446636FB1C4E4D1400F93278 /* posx.jpg */; };
 		446637021C4E4D1400F93278 /* posy.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 446636FC1C4E4D1400F93278 /* posy.jpg */; };
 		446637031C4E4D1400F93278 /* posz.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 446636FD1C4E4D1400F93278 /* posz.jpg */; };
+		446637051C4E83DE00F93278 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446637041C4E83DE00F93278 /* Vertex.swift */; };
+		446637071C4E843300F93278 /* Skysphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446637061C4E843300F93278 /* Skysphere.swift */; };
+		4466370B1C4FA7A400F93278 /* spheremap.png in Resources */ = {isa = PBXBuildFile; fileRef = 446637091C4FA7A400F93278 /* spheremap.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +45,9 @@
 		446636FB1C4E4D1400F93278 /* posx.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = posx.jpg; sourceTree = "<group>"; };
 		446636FC1C4E4D1400F93278 /* posy.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = posy.jpg; sourceTree = "<group>"; };
 		446636FD1C4E4D1400F93278 /* posz.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = posz.jpg; sourceTree = "<group>"; };
+		446637041C4E83DE00F93278 /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
+		446637061C4E843300F93278 /* Skysphere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Skysphere.swift; sourceTree = "<group>"; };
+		446637091C4FA7A400F93278 /* spheremap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spheremap.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +91,7 @@
 			children = (
 				446636CA1C4D25EC00F93278 /* Assets.xcassets */,
 				446636CF1C4D25EC00F93278 /* Cubemaps */,
+				446637081C4FA7A400F93278 /* Spheremaps */,
 				446636CB1C4D25EC00F93278 /* LaunchScreen.storyboard */,
 				446636CD1C4D25EC00F93278 /* Main.storyboard */,
 				446636D61C4D25EC00F93278 /* Info.plist */,
@@ -154,8 +161,18 @@
 			isa = PBXGroup;
 			children = (
 				446636F41C4D33FC00F93278 /* Skybox.swift */,
+				446637061C4E843300F93278 /* Skysphere.swift */,
+				446637041C4E83DE00F93278 /* Vertex.swift */,
 			);
 			path = Objects;
+			sourceTree = "<group>";
+		};
+		446637081C4FA7A400F93278 /* Spheremaps */ = {
+			isa = PBXGroup;
+			children = (
+				446637091C4FA7A400F93278 /* spheremap.png */,
+			);
+			path = Spheremaps;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -223,6 +240,7 @@
 				446637031C4E4D1400F93278 /* posz.jpg in Resources */,
 				446636FE1C4E4D1400F93278 /* negx.jpg in Resources */,
 				446636DA1C4D25EC00F93278 /* Assets.xcassets in Resources */,
+				4466370B1C4FA7A400F93278 /* spheremap.png in Resources */,
 				446637011C4E4D1400F93278 /* posx.jpg in Resources */,
 				446636DB1C4D25EC00F93278 /* LaunchScreen.storyboard in Resources */,
 			);
@@ -235,11 +253,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				446637071C4E843300F93278 /* Skysphere.swift in Sources */,
 				446636EA1C4D2A7F00F93278 /* Scene3DView.swift in Sources */,
 				446636F51C4D33FC00F93278 /* Skybox.swift in Sources */,
 				446636F71C4D340D00F93278 /* Camera.swift in Sources */,
 				446636E41C4D25EC00F93278 /* AppDelegate.swift in Sources */,
 				446636E81C4D2A4800F93278 /* Scene3DViewController.swift in Sources */,
+				446637051C4E83DE00F93278 /* Vertex.swift in Sources */,
 				446636F11C4D2E9800F93278 /* Renderable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
