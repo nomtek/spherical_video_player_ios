@@ -22,6 +22,8 @@ class Scene3DViewController: GLKViewController
 {
     @IBOutlet private weak var scene3DView: Scene3DView!
     private var context: EAGLContext!
+    private var skysphere: Skysphere!
+    private var videoReader: VideoReader!
 
     deinit
     {
@@ -41,12 +43,18 @@ class Scene3DViewController: GLKViewController
         super.viewDidLoad()
         self.configureContext()
         self.configureView()
+        self.configureVideoReader()
     }
 
     // This is one of update variants used by GLKViewController.
     // See comment to GLKViewControllerDelegate.glkViewControllerUpdate for more info.
     func update()
     {
+        self.videoReader?.currentFrame(
+        {
+            [weak self] (size, frameData) -> (Void) in
+            self?.skysphere.updateTexture(size, imageData: frameData)
+        })
     }
 
     // MARK: - Configuration
@@ -60,12 +68,8 @@ class Scene3DViewController: GLKViewController
     {
         self.scene3DView.context = self.context
 
-        let skybox = Skybox()
-        self.scene3DView.addSceneObject(skybox)
-
-        let skysphere = Skysphere(radius: 60)
-        skysphere.loadTexture(UIImage(named: "spheremap.png"))
-        self.scene3DView.addSceneObject(skysphere)
+        self.skysphere = Skysphere(radius: 60)
+        self.scene3DView.addSceneObject(self.skysphere)
 
         // Pan gesture recognizer
         let panGesture = UIPanGestureRecognizer(target: self, action: "panGestureAction:")
@@ -74,19 +78,29 @@ class Scene3DViewController: GLKViewController
         self.view.addGestureRecognizer(panGesture)
     }
 
+    private func configureVideoReader()
+    {
+        if let url = NSBundle.mainBundle().URLForResource("videoplayback", withExtension: "mp4")
+        {
+            self.videoReader = VideoReader(url: url)
+        }
+    }
+
     // MARK: - Event handlers
     func panGestureAction(sender: UIPanGestureRecognizer)
     {
         if (sender.state == .Changed)
         {
-            let translation = sender.velocityInView(sender.view)
-            let camera = self.scene3DView.camera
-            let dh = Float(translation.x / self.view.frame.size.width) * camera.fovRadians
-            let dv = Float(translation.y / self.view.frame.size.height) * camera.fovRadians
-            let dt = Float(self.timeSinceLastUpdate)
+            let dt = CGFloat(self.timeSinceLastUpdate)
+            let velocity = sender.velocityInView(sender.view)
+            let translation = CGPoint(x: velocity.x * dt, y: velocity.y * dt)
 
-            camera.yaw += dh * dt
-            camera.pitch += dv * dt
+            let camera = self.scene3DView.camera
+            let scale = Float(UIScreen.mainScreen().scale)
+            let dh = Float(translation.x / self.view.frame.size.width) * camera.fovRadians * scale
+            let dv = Float(translation.y / self.view.frame.size.height) * camera.fovRadians * scale
+            camera.yaw += dh
+            camera.pitch += dv
         }
     }
 }

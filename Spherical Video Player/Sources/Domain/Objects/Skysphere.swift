@@ -143,6 +143,7 @@ class Skysphere: NSObject, Renderable
         }
     }
 
+    // MARK: - Texture
     func loadTexture(image: UIImage?)
     {
         guard let image = image else
@@ -162,24 +163,7 @@ class Skysphere: NSObject, Renderable
         free(imageData)
     }
 
-    func render(camera: Camera)
-    {
-        glBindVertexArrayOES(self.vertexArray)
-        glBindTexture(GLenum(GL_TEXTURE_2D), self.texture)
-
-        self.effect.transform.projectionMatrix = camera.projection
-        self.effect.transform.modelviewMatrix = camera.view
-        self.effect.texture2d0.enabled = GLboolean(GL_TRUE)
-        self.effect.texture2d0.name = self.texture
-        self.effect.prepareToDraw()
-
-        let bufferOffset = UnsafePointer<UInt>(bitPattern: 0)
-        glDrawElements(GLenum(GL_TRIANGLE_STRIP), GLsizei(self.indices.count - 2), GLenum(GL_UNSIGNED_INT), bufferOffset)
-
-        glBindVertexArrayOES(0)
-    }
-
-    private func updateTexture(size: CGSize, imageData: UnsafeMutablePointer<Void>)
+    func updateTexture(size: CGSize, imageData: UnsafeMutablePointer<Void>)
     {
         if self.texture == 0
         {
@@ -193,6 +177,28 @@ class Skysphere: NSObject, Renderable
         }
 
         glBindTexture(GLenum(GL_TEXTURE_2D), self.texture)
-        glTexImage2D(GLenum(GL_TEXTURE_2D), 0, GLint(GL_RGBA), GLsizei(size.width), GLsizei(size.height), 0, GLenum(GL_RGBA), GLenum(GL_UNSIGNED_BYTE), imageData)
+        glTexImage2D(GLenum(GL_TEXTURE_2D), 0, GLint(GL_RGBA), GLsizei(size.width), GLsizei(size.height), 0, GLenum(GL_BGRA), GLenum(GL_UNSIGNED_BYTE), imageData)
+    }
+
+    // MARK: - Renderable
+    func render(camera: Camera)
+    {
+        guard self.texture != 0 else
+        {
+            return
+        }
+
+        glBindVertexArrayOES(self.vertexArray)
+
+        self.effect.transform.projectionMatrix = camera.projection
+        self.effect.transform.modelviewMatrix = camera.view
+        self.effect.texture2d0.enabled = GLboolean(GL_TRUE)
+        self.effect.texture2d0.name = self.texture
+        self.effect.prepareToDraw()
+
+        let bufferOffset = UnsafePointer<UInt>(bitPattern: 0)
+        glDrawElements(GLenum(GL_TRIANGLE_STRIP), GLsizei(self.indices.count - 2), GLenum(GL_UNSIGNED_INT), bufferOffset)
+
+        glBindVertexArrayOES(0)
     }
 }

@@ -25,6 +25,8 @@
 		446637051C4E83DE00F93278 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446637041C4E83DE00F93278 /* Vertex.swift */; };
 		446637071C4E843300F93278 /* Skysphere.swift in Sources */ = {isa = PBXBuildFile; fileRef = 446637061C4E843300F93278 /* Skysphere.swift */; };
 		4466370B1C4FA7A400F93278 /* spheremap.png in Resources */ = {isa = PBXBuildFile; fileRef = 446637091C4FA7A400F93278 /* spheremap.png */; };
+		4466370E1C4FE85000F93278 /* VideoReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4466370D1C4FE85000F93278 /* VideoReader.swift */; };
+		446637111C51247B00F93278 /* videoplayback.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 446637101C51247B00F93278 /* videoplayback.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@
 		446637041C4E83DE00F93278 /* Vertex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
 		446637061C4E843300F93278 /* Skysphere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Skysphere.swift; sourceTree = "<group>"; };
 		446637091C4FA7A400F93278 /* spheremap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spheremap.png; sourceTree = "<group>"; };
+		4466370D1C4FE85000F93278 /* VideoReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoReader.swift; sourceTree = "<group>"; };
+		446637101C51247B00F93278 /* videoplayback.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = videoplayback.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +96,7 @@
 				446636CA1C4D25EC00F93278 /* Assets.xcassets */,
 				446636CF1C4D25EC00F93278 /* Cubemaps */,
 				446637081C4FA7A400F93278 /* Spheremaps */,
+				4466370F1C51239200F93278 /* Videos */,
 				446636CB1C4D25EC00F93278 /* LaunchScreen.storyboard */,
 				446636CD1C4D25EC00F93278 /* Main.storyboard */,
 				446636D61C4D25EC00F93278 /* Info.plist */,
@@ -127,6 +132,7 @@
 			children = (
 				446636E71C4D2A4800F93278 /* Scene3DViewController.swift */,
 				446636E91C4D2A7F00F93278 /* Scene3DView.swift */,
+				4466370D1C4FE85000F93278 /* VideoReader.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -173,6 +179,14 @@
 				446637091C4FA7A400F93278 /* spheremap.png */,
 			);
 			path = Spheremaps;
+			sourceTree = "<group>";
+		};
+		4466370F1C51239200F93278 /* Videos */ = {
+			isa = PBXGroup;
+			children = (
+				446637101C51247B00F93278 /* videoplayback.mp4 */,
+			);
+			path = Videos;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,6 +250,7 @@
 				446636DC1C4D25EC00F93278 /* Main.storyboard in Resources */,
 				446637001C4E4D1400F93278 /* negz.jpg in Resources */,
 				446637021C4E4D1400F93278 /* posy.jpg in Resources */,
+				446637111C51247B00F93278 /* videoplayback.mp4 in Resources */,
 				446636FF1C4E4D1400F93278 /* negy.jpg in Resources */,
 				446637031C4E4D1400F93278 /* posz.jpg in Resources */,
 				446636FE1C4E4D1400F93278 /* negx.jpg in Resources */,
@@ -257,6 +272,7 @@
 				446636EA1C4D2A7F00F93278 /* Scene3DView.swift in Sources */,
 				446636F51C4D33FC00F93278 /* Skybox.swift in Sources */,
 				446636F71C4D340D00F93278 /* Camera.swift in Sources */,
+				4466370E1C4FE85000F93278 /* VideoReader.swift in Sources */,
 				446636E41C4D25EC00F93278 /* AppDelegate.swift in Sources */,
 				446636E81C4D2A4800F93278 /* Scene3DViewController.swift in Sources */,
 				446637051C4E83DE00F93278 /* Vertex.swift in Sources */,
