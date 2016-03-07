@@ -1,5 +1,5 @@
-# Spherical Video Player
-Project showing how to build a simple player for video 360°.
+# Spherical Video Player for iOS
+iOS project showing how to build a simple player for video 360°.
 
 A tutorial describing the code is divided into 4 parts and can be found in our blog post pages: 
 
