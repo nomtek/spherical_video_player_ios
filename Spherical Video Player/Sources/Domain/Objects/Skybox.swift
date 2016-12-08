@@ -20,8 +20,8 @@ import GLKit
 
 class Skybox: NSObject, Renderable
 {
-    private var cubemap: GLKTextureInfo!
-    private var skyboxEffect = GLKSkyboxEffect()
+    fileprivate var cubemap: GLKTextureInfo!
+    fileprivate var skyboxEffect = GLKSkyboxEffect()
 
     override init()
     {
@@ -29,23 +29,23 @@ class Skybox: NSObject, Renderable
         self.configureCubemap()
     }
 
-    private func configureCubemap()
+    fileprivate func configureCubemap()
     {
         let fileNames = [
-            NSBundle.mainBundle().pathForResource("posx", ofType: "jpg")!,
-            NSBundle.mainBundle().pathForResource("negx", ofType: "jpg")!,
-            NSBundle.mainBundle().pathForResource("posy", ofType: "jpg")!,
-            NSBundle.mainBundle().pathForResource("negy", ofType: "jpg")!,
-            NSBundle.mainBundle().pathForResource("posz", ofType: "jpg")!,
-            NSBundle.mainBundle().pathForResource("negz", ofType: "jpg")!
+            Bundle.main.path(forResource: "posx", ofType: "jpg")!,
+            Bundle.main.path(forResource: "negx", ofType: "jpg")!,
+            Bundle.main.path(forResource: "posy", ofType: "jpg")!,
+            Bundle.main.path(forResource: "negy", ofType: "jpg")!,
+            Bundle.main.path(forResource: "posz", ofType: "jpg")!,
+            Bundle.main.path(forResource: "negz", ofType: "jpg")!
         ]
 
         let options = [GLKTextureLoaderOriginBottomLeft : false]
-        self.cubemap = try? GLKTextureLoader.cubeMapWithContentsOfFiles(fileNames, options: options)
+        self.cubemap = try? GLKTextureLoader.cubeMap(withContentsOfFiles: fileNames, options: options as [String : NSNumber]?)
         self.skyboxEffect.textureCubeMap.name = self.cubemap.name;
     }
 
-    func render(camera: Camera)
+    func render(_ camera: Camera)
     {
         self.skyboxEffect.transform.projectionMatrix = camera.projection
         self.skyboxEffect.transform.modelviewMatrix = GLKMatrix4Scale(camera.view, 50.0, 50.0, 50.0)

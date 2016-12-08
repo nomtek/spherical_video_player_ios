@@ -20,22 +20,22 @@ import AVFoundation
 
 class VideoReader: NSObject
 {
-    private let singleFrameInterval: NSTimeInterval = 0.02
+    fileprivate let singleFrameInterval: TimeInterval = 0.02
 
-    private let videoURL: NSURL!
-    private var videoOutput: AVPlayerItemVideoOutput!
-    private var player: AVPlayer!
-    private var playerItem: AVPlayerItem!
-    private var videoOutputQueue: dispatch_queue_t!
+    fileprivate let videoURL: URL!
+    fileprivate var videoOutput: AVPlayerItemVideoOutput!
+    fileprivate var player: AVPlayer!
+    fileprivate var playerItem: AVPlayerItem!
+    fileprivate var videoOutputQueue: DispatchQueue!
 
-    init(url: NSURL)
+    init(url: URL)
     {
         self.videoURL = url
         super.init()
         self.configureVideoPlayback()
     }
 
-    private override init()
+    fileprivate override init()
     {
         self.videoURL = nil
         super.init()
@@ -43,46 +43,46 @@ class VideoReader: NSObject
 
     deinit
     {
-        self.playerItem.removeOutput(self.videoOutput)
+        self.playerItem.remove(self.videoOutput)
     }
 
-    private func configureVideoPlayback()
+    fileprivate func configureVideoPlayback()
     {
-        let asset = AVURLAsset(URL: self.videoURL, options: nil)
+        let asset = AVURLAsset(url: self.videoURL, options: nil)
         let kTracksKey = "tracks"
         let requestedKeys = [kTracksKey]
-        asset.loadValuesAsynchronouslyForKeys(requestedKeys) { () -> Void in
+        asset.loadValuesAsynchronously(forKeys: requestedKeys) { () -> Void in
 
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            DispatchQueue.main.async(execute: { () -> Void in
 
                 for key in requestedKeys
                 {
                     var error: NSError?
-                    let status = asset.statusOfValueForKey(key, error: &error)
-                    if status == AVKeyValueStatus.Failed
+                    let status = asset.statusOfValue(forKey: key, error: &error)
+                    if status == AVKeyValueStatus.failed
                     {
                         print("Failed to load \(key). Reason: \(error?.localizedDescription)")
                     }
                 }
 
                 var error: NSError?
-                let status = asset.statusOfValueForKey(kTracksKey, error: &error)
-                guard status == .Loaded else
+                let status = asset.statusOfValue(forKey: kTracksKey, error: &error)
+                guard status == .loaded else
                 {
                     print("Failed to load \(kTracksKey). Reason: \(error?.localizedDescription)")
                     return
                 }
 
                 let pixelBufferAttributes = [
-                    kCVPixelBufferPixelFormatTypeKey as String : NSNumber(unsignedInt: kCVPixelFormatType_32BGRA),
+                    kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32BGRA as UInt32),
 //                    kCVPixelBufferWidthKey as String : NSNumber(unsignedInt: 1024),
 //                    kCVPixelBufferHeightKey as String : NSNumber(unsignedInt: 512),
                 ]
                 self.videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: pixelBufferAttributes)
 
                 self.playerItem = AVPlayerItem(asset: asset)
-                self.playerItem.addOutput(self.videoOutput)
-                NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerItemDidPlayToEndTime:", name: AVPlayerItemDidPlayToEndTimeNotification, object: self.playerItem)
+                self.playerItem.add(self.videoOutput)
+                NotificationCenter.default.addObserver(self, selector: #selector(VideoReader.playerItemDidPlayToEndTime(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: self.playerItem)
 
                 self.player = AVPlayer(playerItem: self.playerItem)
                 self.player.play()
@@ -90,15 +90,15 @@ class VideoReader: NSObject
         }
     }
 
-    func currentFrame(frameHandler: ((size: CGSize, frameData: UnsafeMutablePointer<Void>) -> (Void))?)
+    func currentFrame(_ frameHandler: ((_ size: CGSize, _ frameData: UnsafeMutableRawPointer) -> (Void))?)
     {
-        guard self.playerItem?.status == .ReadyToPlay else
+        guard self.playerItem?.status == .readyToPlay else
         {
             return
         }
 
         let currentTime = self.playerItem.currentTime()
-        guard let pixelBuffer = self.videoOutput.copyPixelBufferForItemTime(currentTime, itemTimeForDisplay: nil) else
+        guard let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: currentTime, itemTimeForDisplay: nil) else
         {
             print("empty pixel buffer")
             return
@@ -106,20 +106,20 @@ class VideoReader: NSObject
 
         print("currentTime: \(currentTime.seconds)")
 
-        CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly)
+        CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
 
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
         let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
-        frameHandler?(size: CGSize(width: width, height: height), frameData: baseAddress)
+        frameHandler?(CGSize(width: width, height: height), baseAddress!)
 
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly)
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags.readOnly)
     }
 
     // MARK: - Notifications
-    func playerItemDidPlayToEndTime(notification: NSNotification)
+    func playerItemDidPlayToEndTime(_ notification: Notification)
     {
-        self.player.seekToTime(kCMTimeZero)
+        self.player.seek(to: kCMTimeZero)
         self.player.play()
     }
 }

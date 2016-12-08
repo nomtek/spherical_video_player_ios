@@ -20,20 +20,20 @@ import GLKit
 
 class Scene3DViewController: GLKViewController
 {
-    @IBOutlet private weak var scene3DView: Scene3DView!
-    private var context: EAGLContext!
-    private var skysphere: Skysphere!
-    private var videoReader: VideoReader!
+    @IBOutlet fileprivate weak var scene3DView: Scene3DView!
+    fileprivate var context: EAGLContext!
+    fileprivate var skysphere: Skysphere!
+    fileprivate var videoReader: VideoReader!
 
     deinit
     {
-        if EAGLContext.currentContext() == self.context
+        if EAGLContext.current() == self.context
         {
-            EAGLContext.setCurrentContext(nil)
+            EAGLContext.setCurrent(nil)
         }
     }
 
-    override func prefersStatusBarHidden() -> Bool
+    override var prefersStatusBarHidden : Bool
     {
         return true
     }
@@ -58,13 +58,13 @@ class Scene3DViewController: GLKViewController
     }
 
     // MARK: - Configuration
-    private func configureContext()
+    fileprivate func configureContext()
     {
-        self.context = EAGLContext(API: EAGLRenderingAPI.OpenGLES3)
-        EAGLContext.setCurrentContext(self.context)
+        self.context = EAGLContext(api: EAGLRenderingAPI.openGLES3)
+        EAGLContext.setCurrent(self.context)
     }
 
-    private func configureView()
+    fileprivate func configureView()
     {
         self.scene3DView.context = self.context
 
@@ -72,31 +72,31 @@ class Scene3DViewController: GLKViewController
         self.scene3DView.addSceneObject(self.skysphere)
 
         // Pan gesture recognizer
-        let panGesture = UIPanGestureRecognizer(target: self, action: "panGestureAction:")
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(Scene3DViewController.panGestureAction(_:)))
         panGesture.minimumNumberOfTouches = 1
         panGesture.maximumNumberOfTouches = 1
         self.view.addGestureRecognizer(panGesture)
     }
 
-    private func configureVideoReader()
+    fileprivate func configureVideoReader()
     {
-        if let url = NSBundle.mainBundle().URLForResource("videoplayback", withExtension: "mp4")
+        if let url = Bundle.main.url(forResource: "videoplayback", withExtension: "mp4")
         {
             self.videoReader = VideoReader(url: url)
         }
     }
 
     // MARK: - Event handlers
-    func panGestureAction(sender: UIPanGestureRecognizer)
+    func panGestureAction(_ sender: UIPanGestureRecognizer)
     {
-        if (sender.state == .Changed)
+        if (sender.state == .changed)
         {
             let dt = CGFloat(self.timeSinceLastUpdate)
-            let velocity = sender.velocityInView(sender.view)
+            let velocity = sender.velocity(in: sender.view)
             let translation = CGPoint(x: velocity.x * dt, y: velocity.y * dt)
 
             let camera = self.scene3DView.camera
-            let scale = Float(UIScreen.mainScreen().scale)
+            let scale = Float(UIScreen.main.scale)
             let dh = Float(translation.x / self.view.frame.size.width) * camera.fovRadians * scale
             let dv = Float(translation.y / self.view.frame.size.height) * camera.fovRadians * scale
             camera.yaw += dh

@@ -22,9 +22,9 @@ import QuartzCore
 
 class Skysphere: NSObject, Renderable
 {
-    private let radius: Float
-    private let rows: Int
-    private let columns: Int
+    fileprivate let radius: Float
+    fileprivate let rows: Int
+    fileprivate let columns: Int
 
     init(radius: Float, rows: Int = 20, columns: Int = 20)
     {
@@ -42,21 +42,21 @@ class Skysphere: NSObject, Renderable
         self.unload()
     }
 
-    private let effect = GLKBaseEffect()
-    private var vertices = [TextureVertex]()
-    private var indices = [UInt32]()
-    private var vertexArray: GLuint = 0
-    private var vertexBuffer: GLuint = 0
-    private var indexBuffer: GLuint = 0
-    private var texture: GLuint = 0
+    fileprivate let effect = GLKBaseEffect()
+    fileprivate var vertices = [TextureVertex]()
+    fileprivate var indices = [UInt32]()
+    fileprivate var vertexArray: GLuint = 0
+    fileprivate var vertexBuffer: GLuint = 0
+    fileprivate var indexBuffer: GLuint = 0
+    fileprivate var texture: GLuint = 0
 
-    private func prepareEffect()
+    fileprivate func prepareEffect()
     {
         self.effect.colorMaterialEnabled = GLboolean(GL_TRUE)
         self.effect.useConstantColor = GLboolean(GL_FALSE)
     }
 
-    private func load()
+    fileprivate func load()
     {
         self.unload()
 
@@ -70,27 +70,27 @@ class Skysphere: NSObject, Renderable
 
         glGenBuffers(1, &self.vertexBuffer)
         glBindBuffer(GLenum(GL_ARRAY_BUFFER), self.vertexBuffer)
-        glBufferData(GLenum(GL_ARRAY_BUFFER), sizeof(TextureVertex) * self.vertices.count, self.vertices, GLenum(GL_STATIC_DRAW))
+        glBufferData(GLenum(GL_ARRAY_BUFFER), MemoryLayout<TextureVertex>.size * self.vertices.count, self.vertices, GLenum(GL_STATIC_DRAW))
 
         glGenBuffers(1, &self.indexBuffer)
         glBindBuffer(GLenum(GL_ELEMENT_ARRAY_BUFFER), self.indexBuffer)
-        glBufferData(GLenum(GL_ELEMENT_ARRAY_BUFFER), sizeof(UInt) * self.indices.count, self.indices, GLenum(GL_STATIC_DRAW))
+        glBufferData(GLenum(GL_ELEMENT_ARRAY_BUFFER), MemoryLayout<UInt32>.size * self.indices.count, self.indices, GLenum(GL_STATIC_DRAW))
 
 
         // Describe vertex format to OpenGL
-        let ptr = UnsafePointer<GLfloat>(bitPattern: 0)
-        let sizeOfVertex = GLsizei(sizeof(TextureVertex))
+        let sizeOfVertex = GLsizei(MemoryLayout<TextureVertex>.size)
+        let texOffset = 3 * MemoryLayout<GLfloat>.size
+        let texPtr = UnsafeRawPointer(bitPattern: texOffset)
 
-        glEnableVertexAttribArray(GLuint(GLKVertexAttrib.Position.rawValue))
-        glVertexAttribPointer(GLuint(GLKVertexAttrib.Position.rawValue), GLint(3), GLenum(GL_FLOAT), GLboolean(GL_FALSE), sizeOfVertex, ptr)
-
-        glEnableVertexAttribArray(GLuint(GLKVertexAttrib.TexCoord0.rawValue))
-        glVertexAttribPointer(GLuint(GLKVertexAttrib.TexCoord0.rawValue), GLint(2), GLenum(GL_FLOAT), GLboolean(GL_FALSE), sizeOfVertex, ptr.advancedBy(3))
+        glEnableVertexAttribArray(GLuint(GLKVertexAttrib.position.rawValue))
+        glVertexAttribPointer(GLuint(GLKVertexAttrib.position.rawValue), GLint(3), GLenum(GL_FLOAT), GLboolean(GL_FALSE), sizeOfVertex, nil)
+        glEnableVertexAttribArray(GLuint(GLKVertexAttrib.texCoord0.rawValue))
+        glVertexAttribPointer(GLuint(GLKVertexAttrib.texCoord0.rawValue), GLint(2), GLenum(GL_FLOAT), GLboolean(GL_FALSE), sizeOfVertex, texPtr)
 
         glBindVertexArrayOES(0)
     }
 
-    private func unload()
+    fileprivate func unload()
     {
         self.vertices.removeAll()
         self.indices.removeAll()
@@ -101,7 +101,7 @@ class Skysphere: NSObject, Renderable
         glDeleteTextures(1, &self.texture)
     }
 
-    private func generateVertices()
+    fileprivate func generateVertices()
     {
         let deltaAlpha = Float(2.0 * M_PI) / Float(self.columns)
         let deltaBeta = Float(M_PI) / Float(self.rows)
@@ -125,7 +125,7 @@ class Skysphere: NSObject, Renderable
         }
     }
 
-    private func generateIndicesForTriangleStrip()
+    fileprivate func generateIndicesForTriangleStrip()
     {
         for row in 1...self.rows
         {
@@ -144,26 +144,32 @@ class Skysphere: NSObject, Renderable
     }
 
     // MARK: - Texture
-    func loadTexture(image: UIImage?)
+    func loadTexture(_ image: UIImage?)
     {
-        guard let image = image else
+        guard let cgImage = image?.cgImage else
         {
             return
         }
 
-        let width = CGImageGetWidth(image.CGImage)
-        let height = CGImageGetHeight(image.CGImage)
-        let imageData = UnsafeMutablePointer<GLubyte>(calloc(Int(width * height * 4), sizeof(GLubyte)))
-        let imageColorSpace = CGImageGetColorSpace(image.CGImage)
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedLast.rawValue)
-        let gc = CGBitmapContextCreate(imageData, width, height, 8, 4 * width, imageColorSpace, bitmapInfo.rawValue)
-        CGContextDrawImage(gc, CGRectMake(0, 0, CGFloat(width), CGFloat(height)), image.CGImage)
+        let width = cgImage.width
+        let height = cgImage.height
+        let ptrCapacity = Int(width * height * 4)
+        let ptr = UnsafeMutablePointer<GLubyte>.allocate(capacity: ptrCapacity)
+        let imageData = ptr
 
-        self.updateTexture(CGSize(width: width, height: height), imageData: imageData)
-        free(imageData)
+        let imageColorSpace = cgImage.colorSpace!
+        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+        if let gc = CGContext(data: imageData, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: imageColorSpace, bitmapInfo: bitmapInfo.rawValue)
+        {
+            gc.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
+
+            self.updateTexture(CGSize(width: width, height: height), imageData: imageData)
+        }
+        ptr.deinitialize()
+        ptr.deallocate(capacity: ptrCapacity)
     }
 
-    func updateTexture(size: CGSize, imageData: UnsafeMutablePointer<Void>)
+    func updateTexture(_ size: CGSize, imageData: UnsafeMutableRawPointer)
     {
         if self.texture == 0
         {
@@ -181,7 +187,7 @@ class Skysphere: NSObject, Renderable
     }
 
     // MARK: - Renderable
-    func render(camera: Camera)
+    func render(_ camera: Camera)
     {
         guard self.texture != 0 else
         {
@@ -196,8 +202,7 @@ class Skysphere: NSObject, Renderable
         self.effect.texture2d0.name = self.texture
         self.effect.prepareToDraw()
 
-        let bufferOffset = UnsafePointer<UInt>(bitPattern: 0)
-        glDrawElements(GLenum(GL_TRIANGLE_STRIP), GLsizei(self.indices.count - 2), GLenum(GL_UNSIGNED_INT), bufferOffset)
+        glDrawElements(GLenum(GL_TRIANGLE_STRIP), GLsizei(self.indices.count - 2), GLenum(GL_UNSIGNED_INT), nil)
 
         glBindVertexArrayOES(0)
     }
